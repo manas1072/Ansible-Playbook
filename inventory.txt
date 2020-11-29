@@ -1,0 +1,1 @@
+192.168.3.70 ansible_user=root ansible_ssh_pass=ansibleos ansible_connection=ssh
