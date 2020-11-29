@@ -1,0 +1,49 @@
+- hosts: all
+  tasks:
+  - name: "Docker Repository"
+    yum_repository:
+        name: "docker123"
+        baseurl: "https://download.docker.com/linux/centos/7/x86_64/stable/"
+        gpgcheck: no
+        description: "Docker Repo"
+
+  
+  - name: "Installing Docker-CE version"
+    command:
+        cmd: "yum install docker-ce --nobest -y"
+        warn: no
+ 
+  - name: "Starting Docker services"
+    service: 
+        name: "docker"
+        state: started
+        enabled: yes
+
+  - name: "Making Directory"
+    file:
+        path: "/webfolder"
+        state: directory
+
+  - name: "Installing Pyhton SDK for Docker"  
+    command: "pip3 install docker-py"
+
+  - name: "Download Docker HTTPD image"
+    docker_image:
+        name: httpd
+        tag: latest
+        source: pull
+
+  - name: "Copy Web Pages to the directory"
+    copy:
+        src: "task.html"
+        dest: "/webfolder"
+ 
+  - name: "Launching Docker Httpd container"
+    docker_container:
+        name: "WebServer"
+        image: httpd
+        state: started
+        exposed_ports: "80"
+        ports: "8080:80"
+        volumes:
+        - /webfolder:/usr/local/apache2/htdocs/
